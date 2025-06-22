@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>2-Product Menu</title>
+  <link rel="stylesheet" href="menu.css">
+  
+</head>
+<body>
+  <h1>Our Cofee Menu</h1>
+  <p style="text-align: center;">Select at least 1 item to checkout</p>
+
+  <div class="buttons">
+    <button class="reset" id="resetBtn">Reset All Items</button>
+    <button class="checkout" id="checkoutBtn" disabled>Checkout</button>
+  </div>
+
+  <div class="menu-container">
+    <div class="card" data-id="1">
+      <img src="pract2 images/BROWN-COFFE.jpg" alt="Vegetable Salad">
+      <div class="card-content">
+        <h3>Brown Coffe</h3>
+        <p>Fresh blend of beans, boldness, and bad decisions!</p>
+        <div class="price">$8.99</div>
+        <div class="counter">
+          <button class="minus">-</button>
+          <span class="quantity">0</span>
+          <button class="plus">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" data-id="2">
+      <img src="pract2 images/ICE-COFEE.jpg" alt="Grilled Chicken">
+      <div class="card-content">
+        <h3>Ice Coffee</h3>
+        <p>Cold mix of coffee, coolness, and a little drama</p>
+        <div class="price">$10.99</div>
+        <div class="counter">
+          <button class="minus">-</button>
+          <span class="quantity">0</span>
+          <button class="plus">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="order-summary">
+    <h2>Your Order</h2>
+    <ul id="orderList"></ul>
+    <p><strong>Total:</strong> $<span id="total">0.00</span></p>
+  </div>
+
+  <div class="modal" id="successModal">
+    <div class="modal-content">
+      <h2>Order Successful!</h2>
+      <p>Thank you for your purchase.</p>
+      <button id="closeModal">Close</button>
+    </div>
+  </div>
+  <div class ="center-soon">More flavors brewing soon — stay tuned!....<div>
+  <script>
+    const menuData = {
+      1: { name: "Vegetable Salad", price: 8.99, quantity: 0 },
+      2: { name: "Grilled Chicken", price: 12.99, quantity: 0 }
+    };
+
+    const orderList = document.getElementById('orderList');
+    const totalDisplay = document.getElementById('total');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const successModal = document.getElementById('successModal');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    const cards = document.querySelectorAll('.card');
+
+    cards.forEach(card => {
+      const id = card.getAttribute('data-id');
+      const plus = card.querySelector('.plus');
+      const minus = card.querySelector('.minus');
+      const quantitySpan = card.querySelector('.quantity');
+
+      plus.addEventListener('click', () => {
+        menuData[id].quantity++;
+        quantitySpan.textContent = menuData[id].quantity;
+        updateOrder();
+      });
+
+      minus.addEventListener('click', () => {
+        if (menuData[id].quantity > 0) {
+          menuData[id].quantity--;
+          quantitySpan.textContent = menuData[id].quantity;
+          updateOrder();
+        }
+      });
+    });
+
+    function updateOrder() {
+      orderList.innerHTML = '';
+      let total = 0;
+      let hasItems = false;
+
+      for (const id in menuData) {
+        const item = menuData[id];
+        if (item.quantity > 0) {
+          const li = document.createElement('li');
+          li.textContent = `${item.name} x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}`;
+          orderList.appendChild(li);
+          total += item.price * item.quantity;
+          hasItems = true;
+        }
+      }
+
+      totalDisplay.textContent = total.toFixed(2);
+      checkoutBtn.disabled = !hasItems;
+    }
+
+    resetBtn.addEventListener('click', () => {
+      for (const id in menuData) {
+        menuData[id].quantity = 0;
+      }
+
+      document.querySelectorAll('.quantity').forEach(q => q.textContent = '0');
+      updateOrder();
+    });
+
+    checkoutBtn.addEventListener('click', () => {
+      if (!checkoutBtn.disabled) {
+        successModal.style.display = 'flex';
+      }
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+      successModal.style.display = 'none';
+      resetBtn.click(); // Reset after order
+    });
+  </script>
+</body>
+</html>
